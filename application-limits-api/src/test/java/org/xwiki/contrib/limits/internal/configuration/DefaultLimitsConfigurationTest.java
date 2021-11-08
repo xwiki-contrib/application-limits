@@ -25,14 +25,11 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.contrib.limits.LimitsConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @version $Id: $
@@ -78,106 +75,4 @@ public class DefaultLimitsConfigurationTest
         customLimits = config.getCustomLimits();
         assertEquals(0, customLimits.size());
     }
-
-    @Test
-    public void testWhenConfigIsEmpty() throws Exception
-    {
-        DefaultLimitsConfiguration.configFile = Paths.get(getClass().getResource("/limitsError1.xml").toURI());
-
-        InitializationException caught = null;
-        try {
-            mocker.getComponentUnderTest();
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof InitializationException) {
-                caught = (InitializationException) e.getCause();
-            }
-        }
-
-        assertNotNull(caught);
-        assertEquals("Failed to load the configuration of the Limits Application.", caught.getMessage());
-        assertEquals(String.format("Failed to parse the configuration file for the Limits Application [%s].",
-                        DefaultLimitsConfiguration.configFile),
-                caught.getCause().getMessage());
-        assertEquals("Error on line -1: Premature end of file.", caught.getCause().getCause().getMessage());
-    }
-
-    @Test
-    public void testWhenFieldIsMissing() throws Exception
-    {
-        DefaultLimitsConfiguration.configFile = Paths.get(getClass().getResource("/limitsError2.xml").toURI());
-
-        InitializationException caught = null;
-        try {
-            mocker.getComponentUnderTest();
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof InitializationException) {
-                caught = (InitializationException) e.getCause();
-            }
-        }
-
-        assertNotNull(caught);
-        assertEquals("Failed to load the configuration of the Limits Application.", caught.getMessage());
-        assertEquals("[null] is not a valid number for the limit of [number-of-users].", caught.getCause().getMessage());
-    }
-
-    @Test
-    public void testWhenCustomLimitIsUnparsableDate() throws Exception
-    {
-        DefaultLimitsConfiguration.configFile = Paths.get(getClass().getResource("/limitsError3.xml").toURI());
-
-        InitializationException caught = null;
-        try {
-            mocker.getComponentUnderTest();
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof InitializationException) {
-                caught = (InitializationException) e.getCause();
-            }
-        }
-
-        assertNotNull(caught);
-        assertEquals("Failed to load the configuration of the Limits Application.", caught.getMessage());
-        assertEquals("[hello] is a not a valid date for the limit [time]. Supported format is yyyy-MM-dd HH:mm.",
-                caught.getCause().getMessage());
-    }
-
-    @Test
-    public void testWhenCustomLimitIsUnparsableLong() throws Exception
-    {
-        DefaultLimitsConfiguration.configFile = Paths.get(getClass().getResource("/limitsError4.xml").toURI());
-
-        InitializationException caught = null;
-        try {
-            mocker.getComponentUnderTest();
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof InitializationException) {
-                caught = (InitializationException) e.getCause();
-            }
-        }
-
-        assertNotNull(caught);
-        assertEquals("Failed to load the configuration of the Limits Application.", caught.getMessage());
-        assertEquals("[hello] is not a valid number for the limit [whatever].",
-                caught.getCause().getMessage());
-    }
-
-    @Test
-    public void testWhenCustomLimitHasNoType() throws Exception
-    {
-        DefaultLimitsConfiguration.configFile = Paths.get(getClass().getResource("/limitsError5.xml").toURI());
-
-        InitializationException caught = null;
-        try {
-            mocker.getComponentUnderTest();
-        } catch (ComponentLookupException e) {
-            if (e.getCause() instanceof InitializationException) {
-                caught = (InitializationException) e.getCause();
-            }
-        }
-
-        assertNotNull(caught);
-        assertEquals("Failed to load the configuration of the Limits Application.", caught.getMessage());
-        assertEquals("Missing attribute \"type\" for the limit [whatever].",
-                caught.getCause().getMessage());
-    }
-
 }

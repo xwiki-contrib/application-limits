@@ -29,12 +29,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -58,9 +60,12 @@ public class DefaultLimitsConfiguration implements LimitsConfiguration, Initiali
      */
     protected static Path configFile = Paths.get("/", "etc", "xwiki", "limits.xml");
 
-    private int numberOfUsers;
+    @Inject
+    private Logger logger;
 
-    private int numberOfWikis;
+    private int numberOfUsers = Integer.MAX_VALUE;
+
+    private int numberOfWikis = Integer.MAX_VALUE;
 
     private HashMap<DocumentReference, Number> groupLimits = new HashMap<>();
 
@@ -72,7 +77,7 @@ public class DefaultLimitsConfiguration implements LimitsConfiguration, Initiali
         try {
             reload();
         } catch (Exception e) {
-            throw new InitializationException("Failed to load the configuration of the Limits Application.", e);
+            logger.error("Failed to load the configuration of the Limits Application.", e);
         }
     }
 
@@ -96,7 +101,7 @@ public class DefaultLimitsConfiguration implements LimitsConfiguration, Initiali
         } catch (JDOMException | IOException e) {
             throw new Exception(
                     String.format(
-                            "Failed to parse the configuration file for the Limits Application [%s].",
+                            "Failed to parse the configuration file for the Limits Application [%s].",
                             configFile),
                     e);
         }
